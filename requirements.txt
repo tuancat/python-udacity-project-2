@@ -1,0 +1,7 @@
+pandas
+Pillow
+numpy
+Flask
+PyPDF2
+cer
+tabula-py

@@ -1,7 +1,15 @@
 import os
 import random
 
+
+from model import QuoteModel
+
+
 # @TODO Import your Ingestor and MemeEngine classes
+
+
+class MemeEngine:
+    pass
 
 
 def generate_meme(path=None, body=None, author=None):
