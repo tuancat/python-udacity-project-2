@@ -1,7 +1,10 @@
 import random
 import os
 import requests
+from PIL import Image
 from flask import Flask, render_template, abort, request
+
+from model import MemeEngine, Ingestor
 
 # @TODO Import your Ingestor and MemeEngine classes
 
@@ -20,13 +23,20 @@ def setup():
 
     # TODO: Use the Ingestor class to parse all files in the
     # quote_files variable
-    quotes = None
+    quotes = []
+    for f in quote_files:
+        quotes.extend(Ingestor.parse(f))
+
 
     images_path = "./_data/photos/dog/"
 
     # TODO: Use the pythons standard library os class to find all
     # images within the images images_path directory
-    imgs = None
+    images = "./_data/photos/dog/"
+    imgs = []
+    for root, dirs, files in os.walk(images):
+        imgs = [os.path.join(root, name) for name in files]
+
 
     return quotes, imgs
 
@@ -45,6 +55,10 @@ def meme_rand():
 
     img = None
     quote = None
+    img = random.choice(imgs)
+    quote = random.choice(quotes)
+    print(quote);
+    print(f'image path: {img}')
     path = meme.make_meme(img, quote.body, quote.author)
     return render_template('meme.html', path=path)
 
@@ -65,8 +79,14 @@ def meme_post():
     # 2. Use the meme object to generate a meme using this temp
     #    file and the body and author form paramaters.
     # 3. Remove the temporary saved image.
+    image_url = request.form.get('image_url')
+    body = request.form.get('body')
+    author = request.form.get('author')
+    im = Image.open(requests.get(image_url, stream=True).raw)
+    tmpPath = f'{meme.folder}/tmp.jpg';
+    im.save(tmpPath, "JPEG", quality=80, optimize=True, progressive=True)
 
-    path = None
+    path = meme.make_meme(tmpPath, body, author)
 
     return render_template('meme.html', path=path)
 

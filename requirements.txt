@@ -3,5 +3,7 @@ Pillow
 numpy
 Flask
 PyPDF2
+python-docx
 cer
 tabula-py
+requests

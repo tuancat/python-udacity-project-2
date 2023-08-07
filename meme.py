@@ -2,14 +2,13 @@ import os
 import random
 
 
-from model import QuoteModel
+from model import QuoteModel, Ingestor, MemeEngine
 
 
 # @TODO Import your Ingestor and MemeEngine classes
 
 
-class MemeEngine:
-    pass
+
 
 
 def generate_meme(path=None, body=None, author=None):
@@ -24,6 +23,7 @@ def generate_meme(path=None, body=None, author=None):
             imgs = [os.path.join(root, name) for name in files]
 
         img = random.choice(imgs)
+        print(f'image path: {img}')
     else:
         img = path[0]
 
@@ -37,6 +37,7 @@ def generate_meme(path=None, body=None, author=None):
             quotes.extend(Ingestor.parse(f))
 
         quote = random.choice(quotes)
+        print(quote);
     else:
         if author is None:
             raise Exception('Author Required if Body is Used')
@@ -53,4 +54,4 @@ if __name__ == "__main__":
     # body - quote body to add to the image
     # author - quote author to add to the image
     args = None
-    print(generate_meme(args.path, args.body, args.author))
+    print(generate_meme(None, None, None))
