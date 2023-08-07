@@ -9,30 +9,74 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 class QuoteModel:
-
+    """_summary_
+    """
     def __init__(self, body, author):
+        """_summary_
+
+        Args:
+            body (_type_): _description_
+            author (_type_): _description_
+        """
         self.body = body
         self.author = author
 
     def __str__(self):
+        """_summary_
+
+        Returns:
+            _type_: _description_
+        """
         return f"body:{self.body} and, Author: {self.author}."
 
 
 class IngestorInterface(ABC):
+    """_summary_
+
+    Args:
+        ABC (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     allowExtendsion = ['csv', 'txt', 'pdf', 'doc'];
 
     @classmethod
     def canIngest(cls, path):
+        """_summary_
+
+        Args:
+            path (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """    
         ext = path.split('.')[-1];
         return ext in cls.allowExtendsion;
 
     @abstractmethod
     def parse(cls, path: str) -> List[QuoteModel]:
+        """_summary_
+
+        Args:
+            path (str): _description_
+
+        Returns:
+            List[QuoteModel]: _description_
+        """     
         pass
 
 
 class CSVIngestor(IngestorInterface):
     def parse(cls, path: str) -> List[QuoteModel]:
+        """_summary_
+
+        Args:
+            path (str): _description_
+
+        Returns:
+            List[QuoteModel]: _description_
+        """
         result = [];
         df = pd.read_csv(path);
         # print(df['body'].head());
@@ -41,8 +85,21 @@ class CSVIngestor(IngestorInterface):
             result.append(q);
         return result
 class DocxInvestor(IngestorInterface):
+    """_summary_
 
+    Args:
+        IngestorInterface (_type_): _description_
+    """
+    
     def parse(cls, path: str) -> List[QuoteModel]:
+        """_summary_
+
+        Args:
+            path (str): _description_
+
+        Returns:
+            List[QuoteModel]: _description_
+        """
         result = [];
         doc = docx.Document(path)
         for i in doc.paragraphs:
@@ -57,8 +114,20 @@ class DocxInvestor(IngestorInterface):
 
 
 class TXTIngestor(IngestorInterface):
+    """_summary_
 
+    Args:
+        IngestorInterface (_type_): _description_
+    """
     def parse(cls, path: str) -> List[QuoteModel]:
+        """_summary_
+
+        Args:
+            path (str): _description_
+
+        Returns:
+            List[QuoteModel]: _description_
+        """        
         result = [];
         f = open(path, "r")
         arrStr = f.readlines()
@@ -71,7 +140,20 @@ class TXTIngestor(IngestorInterface):
 
 
 class PDFIngestor(IngestorInterface):
+    """_summary_
+
+    Args:
+        IngestorInterface (_type_): _description_
+    """    
     def parse(self, path: str) -> List[QuoteModel]:
+        """_summary_
+
+        Args:
+            path (str): _description_
+
+        Returns:
+            List[QuoteModel]: _description_
+        """        
         # creating a pdf reader object
         result = [];
         reader = PyPDF2.PdfReader(path)
@@ -88,10 +170,25 @@ class PDFIngestor(IngestorInterface):
         return result;
 
 class Ingestor(IngestorInterface):
+    """_summary_
 
+    Args:
+        IngestorInterface (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     ingestors = [CSVIngestor, PDFIngestor, TXTIngestor, DocxInvestor]
     @classmethod
     def parse(cls, path: str, ) -> List[QuoteModel]:
+        """_summary_
+
+        Args:
+            path (str): _description_
+
+        Returns:
+            List[QuoteModel]: _description_
+        """        
         result = [];
         for ingestor in cls.ingestors:
             ext = path.split('.')[-1];
@@ -111,13 +208,22 @@ class Ingestor(IngestorInterface):
 
 
 class QuoteEngine:
-
+    """_summary_
+    """
     def __init__(self) -> None:
+        """_summary_
+        """        
         super().__init__()
 
 class MemeEngine:
-
+    """_summary_
+    """
     def __init__(self, folderPath: str):
+        """_summary_
+
+        Args:
+            folderPath (str): _description_
+        """        
         self.folderPath = folderPath
 
     @property
@@ -131,6 +237,16 @@ class MemeEngine:
         return self.folderPath
 
     def make_meme(self, img, body, author):
+        """_summary_
+
+        Args:
+            img (_type_): _description_
+            body (_type_): _description_
+            author (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """        
         im = Image.open(img);
         width, height = im.size
         newSize = (500, height);
@@ -143,17 +259,3 @@ class MemeEngine:
         im.save(path, "JPEG", quality=80, optimize=True, progressive=True)
         return path
 
-def main():
-    pdf = PDFIngestor()
-    csv = CSVIngestor();
-    txt = TXTIngestor();
-    docx = DocxInvestor();
-    # listQuotes = pdf.parse('./_data/DogQuotes/DogQuotesPDF.pdf')
-    # listQuotestCSV =csv.parse('./_data/DogQuotes/DogQuotesCSV.csv');
-    # listQuotestTXT = txt.parse('./_data/DogQuotes/DogQuotesTXT.txt');
-    listQuotestDoc = docx.parse('./_data/DogQuotes/DogQuotesDOCX.docx');
-    # print("len of CSV:" + str(len(listQuotestCSV)))
-
-
-if __name__ == "__main__":
-    main()
