@@ -1,12 +1,11 @@
+"""Represent models for near-Earth objects and their close approaches."""
 import random
 import os
 import requests
 from PIL import Image
 from flask import Flask, render_template, abort, request
 
-from model import MemeEngine, Ingestor
-
-# @TODO Import your Ingestor and MemeEngine classes
+from model import MemeEngine, Ingestor, MemeGenerator
 
 app = Flask(__name__)
 
@@ -14,6 +13,11 @@ meme = MemeEngine("./static")
 
 
 def setup():
+    """_summary_.
+
+    Returns:
+        _type_: _description_.
+    """
     """Load all resources"""
 
     quote_files = [
@@ -23,8 +27,6 @@ def setup():
         "./_data/DogQuotes/DogQuotesCSV.csv",
     ]
 
-    # TODO: Use the Ingestor class to parse all files in the
-    # quote_files variable
     quotes = []
     for f in quote_files:
         quotes.extend(Ingestor.parse(f))
@@ -46,49 +48,61 @@ quotes, imgs = setup()
 
 @app.route("/")
 def meme_rand():
+    """_summary_.
+
+    Returns:
+        _type_: _description_.
+    """
     """Generate a random meme"""
-
-    # @TODO:
-    # Use the random python standard library class to:
-    # 1. select a random image from imgs array
-    # 2. select a random quote from the quotes array
-
-    img = None
-    quote = None
     img = random.choice(imgs)
     quote = random.choice(quotes)
     print(quote)
     print(f"image path: {img}")
-    path = meme.make_meme(img, quote.body, quote.author)
-    return render_template("meme.html", path=path)
+
+    try:
+        path = f"{meme.folder}/{random.random()}.jpg"
+        mew = MemeGenerator(Image.open(img), path)
+        newImg = mew.insertText(quote)
+        mew.saveImage(newImg)
+        return render_template("meme.html", path=path)
+    except Exception:
+        errorPath = "./static/error.png"
+        return render_template("error.html", path=errorPath)
 
 
 @app.route("/create", methods=["GET"])
 def meme_form():
+    """_summary_.
+
+    Returns:
+        _type_: _description_.
+    """
     """User input for meme information"""
     return render_template("meme_form.html")
 
 
 @app.route("/create", methods=["POST"])
 def meme_post():
+    """_summary_.
+
+    Returns:
+        _type_: _description_.
+    """
     """Create a user defined meme"""
+    try:
+        image_url = request.form.get("image_url")
+        body = request.form.get("body")
+        author = request.form.get("author")
+        im = Image.open(requests.get(image_url, stream=True).raw)
+        tmpPath = f"{meme.folder}/tmp.jpg"
+        im.save(tmpPath, "JPEG", quality=80, optimize=True, progressive=True)
 
-    # @TODO:
-    # 1. Use requests to save the image from the image_url
-    #    form param to a temp local file.
-    # 2. Use the meme object to generate a meme using this temp
-    #    file and the body and author form paramaters.
-    # 3. Remove the temporary saved image.
-    image_url = request.form.get("image_url")
-    body = request.form.get("body")
-    author = request.form.get("author")
-    im = Image.open(requests.get(image_url, stream=True).raw)
-    tmpPath = f"{meme.folder}/tmp.jpg"
-    im.save(tmpPath, "JPEG", quality=80, optimize=True, progressive=True)
+        path = meme.make_meme(tmpPath, body, author)
 
-    path = meme.make_meme(tmpPath, body, author)
-
-    return render_template("meme.html", path=path)
+        return render_template("meme.html", path=path)
+    except Exception:
+        errorPath = "./static/error.png"
+        return render_template("error.html", path=errorPath)
 
 
 if __name__ == "__main__":
