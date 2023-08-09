@@ -1,6 +1,6 @@
+"""Represent models for near-Earth objects and their close approaches."""
 import os
 import random
-
 
 from model import QuoteModel, Ingestor, MemeEngine
 
@@ -9,7 +9,7 @@ from model import QuoteModel, Ingestor, MemeEngine
 
 
 def generate_meme(path=None, body=None, author=None):
-    """_summary_
+    """_summary_.
 
     Args:
         path (_type_, optional): _description_. Defaults to None.
@@ -17,10 +17,10 @@ def generate_meme(path=None, body=None, author=None):
         author (_type_, optional): _description_. Defaults to None.
 
     Raises:
-        Exception: _description_
+        Exception: _description_.
 
     Returns:
-        _type_: _description_
+        _type_: _description_.
     """
     """ Generate a meme given an path and a quote """
     img = None
