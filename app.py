@@ -65,7 +65,7 @@ def meme_rand():
         newImg = mew.insertText(quote)
         mew.saveImage(newImg)
         return render_template("meme.html", path=path)
-    except Exception:
+    except requests.exceptions.ConnectionError:
         errorPath = "./static/error.png"
         return render_template("error.html", path=errorPath)
 
@@ -100,7 +100,7 @@ def meme_post():
         path = meme.make_meme(tmpPath, body, author)
 
         return render_template("meme.html", path=path)
-    except Exception:
+    except requests.exceptions.ConnectionError:
         errorPath = "./static/error.png"
         return render_template("error.html", path=errorPath)
 
